@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+  BILLING
+}
+
+model User {
+  id           String @id @default(uuid())
+  email        String @unique
+  name         String
+  passwordHash String @map("password_hash")
+
+  member_on          Member[]
+  owns_organizations Organization[]
+  invites            Invite[]
+
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt
+  Products  Products[]
+
+  @@map("users")
+}
+
+model Member {
+  id   String @id @default(uuid())
+  role Role   @default(MEMBER)
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String       @map("organization_id")
+
+  @@unique([userId, organizationId])
+  @@map("members")
+}
+
+model Organization {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  imageUrl    String? @map("image_url")
+
+  members  Member[]
+  invites  Invite[]
+  products Products[]
+
+  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId String @map("owner_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("organizations")
+}
+
+model Invite {
+  id        String   @id @default(uuid())
+  email     String
+  role      Role
+  createdAt DateTime @default(now()) @map("created_at")
+
+  author   User?   @relation(fields: [authorId], references: [id])
+  authorId String? @map("author_id")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String       @map("organization_id")
+
+  @@unique([email, organizationId])
+  @@index([email])
+  @@map("invites")
+}
+
+model Products {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  stock       Int     @default(0)
+  code        String
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String       @map("organization_id")
+
+  registered_by User   @relation(fields: [userId], references: [id])
+  userId        String @map("user_id")
+
+  @@map("products")
+}
