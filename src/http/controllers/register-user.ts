@@ -3,6 +3,7 @@ import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { prisma } from "src/lib/prismadb";
 import z from "zod";
+import { BadRequestError } from "../_errors/bad-request-error";
 
 export async function registerUserRoute(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>()
@@ -36,7 +37,7 @@ export async function registerUserRoute(app: FastifyInstance) {
       })
 
       if(emailAlreadyInUse) {
-        throw new Error()
+        throw new BadRequestError("Email already in use.")
       }
 
       const passwordHash = await hash(password, 8)

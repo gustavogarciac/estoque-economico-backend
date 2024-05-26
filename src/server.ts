@@ -3,6 +3,7 @@ import fastifySwaggerUi from "@fastify/swagger-ui"
 import fastify from "fastify"
 import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from "fastify-type-provider-zod"
 import { registerUserRoute } from "./http/controllers/register-user"
+import { errorHandler } from "./http/error-handler"
 
 const app = fastify()
 
@@ -25,6 +26,8 @@ app.register(fastifySwaggerUi, {
 
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
+
+app.setErrorHandler(errorHandler)
 
 /* Routes */
 app.register(registerUserRoute)
