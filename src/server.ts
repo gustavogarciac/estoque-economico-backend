@@ -2,6 +2,7 @@ import fastifySwagger from "@fastify/swagger"
 import fastifySwaggerUi from "@fastify/swagger-ui"
 import fastify from "fastify"
 import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from "fastify-type-provider-zod"
+import { registerUserRoute } from "./http/controllers/register-user"
 
 const app = fastify()
 
@@ -24,6 +25,9 @@ app.register(fastifySwaggerUi, {
 
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
+
+/* Routes */
+app.register(registerUserRoute)
 
 app.listen({
   port: 3333,
