@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "tsx watch src/server.ts"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -21,7 +24,9 @@
     "@fastify/swagger": "^8.14.0",
     "@fastify/swagger-ui": "^3.0.0",
     "@prisma/client": "5.14.0",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.12.12",
+    "bcryptjs": "^2.4.3",
     "fastify": "^4.27.0",
     "fastify-type-provider-zod": "^1.2.0",
     "prisma": "^5.14.0",
