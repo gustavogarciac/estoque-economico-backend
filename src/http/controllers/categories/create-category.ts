@@ -7,10 +7,13 @@ import z from "zod";
 export async function createCategoryRoute(app: FastifyInstance) {
   app
     .withTypeProvider<ZodTypeProvider>()
-    .post("/categories", {
+    .post("/categories/:organizationId", {
       schema: {
         summary: "Create a new category",
         tags: ['categories'],
+        params: z.object({
+          organizationId: z.string().uuid(),
+        }),
         body: z.object({
           name: z.string(),
           description: z.string().optional(),
@@ -29,6 +32,10 @@ export async function createCategoryRoute(app: FastifyInstance) {
         description,
         imageUrl
       } = req.body
+
+      const {
+        organizationId
+      } = req.params
       
       const categoryAlreadyExists = await prisma.category.findUnique({
         where: {
@@ -42,7 +49,12 @@ export async function createCategoryRoute(app: FastifyInstance) {
         data: {
           name,
           description,
-          imageUrl
+          imageUrl,
+          organization: {
+            connect: {
+              id: organizationId
+            }
+          }
         }
       })
 

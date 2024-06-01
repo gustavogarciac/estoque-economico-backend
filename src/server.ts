@@ -15,6 +15,7 @@ import { registerUserRoute } from './http/controllers/register-user'
 import { errorHandler } from './http/error-handler'
 import { createCategoryRoute } from './http/controllers/categories/create-category'
 import { getCategoryDetailsRoute } from './http/controllers/categories/show-category-details'
+import { getCategoriesRoute } from './http/controllers/categories/get-categories'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -50,6 +51,7 @@ app.register(registerUserRoute)
 app.register(authenticateWithPasswordRoute)
 app.register(createCategoryRoute)
 app.register(getCategoryDetailsRoute)
+app.register(getCategoriesRoute)
 
 app
   .listen({
