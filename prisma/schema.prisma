@@ -91,8 +91,22 @@ model Products {
   organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String       @map("organization_id")
 
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String   @map("category_id")
+
   registered_by User   @relation(fields: [userId], references: [id])
   userId        String @map("user_id")
 
   @@map("products")
+}
+
+model Category {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+  imageUrl    String? @map("image_url")
+
+  products Products[]
+
+  @@map("categories")
 }
