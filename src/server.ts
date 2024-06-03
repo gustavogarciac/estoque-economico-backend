@@ -11,11 +11,11 @@ import {
 
 import { env } from './env'
 import { authenticateWithPasswordRoute } from './http/controllers/authenticate-with-password'
+import { createCategoryRoute } from './http/controllers/categories/create-category'
+import { getCategoriesRoute } from './http/controllers/categories/get-categories'
+import { getCategoryDetailsRoute } from './http/controllers/categories/show-category-details'
 import { registerUserRoute } from './http/controllers/register-user'
 import { errorHandler } from './http/error-handler'
-import { createCategoryRoute } from './http/controllers/categories/create-category'
-import { getCategoryDetailsRoute } from './http/controllers/categories/show-category-details'
-import { getCategoriesRoute } from './http/controllers/categories/get-categories'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 

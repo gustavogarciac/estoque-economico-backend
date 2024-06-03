@@ -1,15 +1,15 @@
-import { FastifyInstance } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
-import { BadRequestError } from "src/http/_errors/bad-request-error";
-import { prisma } from "src/lib/prismadb";
-import z from "zod";
+import { FastifyInstance } from 'fastify'
+import { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { BadRequestError } from 'src/http/_errors/bad-request-error'
+import { prisma } from 'src/lib/prismadb'
+import z from 'zod'
 
 export async function createCategoryRoute(app: FastifyInstance) {
-  app
-    .withTypeProvider<ZodTypeProvider>()
-    .post("/categories/:organizationId", {
+  app.withTypeProvider<ZodTypeProvider>().post(
+    '/categories/:organizationId',
+    {
       schema: {
-        summary: "Create a new category",
+        summary: 'Create a new category',
         tags: ['categories'],
         params: z.object({
           organizationId: z.string().uuid(),
@@ -17,33 +17,28 @@ export async function createCategoryRoute(app: FastifyInstance) {
         body: z.object({
           name: z.string(),
           description: z.string().optional(),
-          imageUrl: z.string().optional()
+          imageUrl: z.string().optional(),
         }),
         response: {
           201: z.object({
-            categoryId: z.string().uuid()
-          })
-        }
-      }
-    }, async (req, reply) => {
+            categoryId: z.string().uuid(),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      const { name, description, imageUrl } = req.body
 
-      const {
-        name,
-        description,
-        imageUrl
-      } = req.body
+      const { organizationId } = req.params
 
-      const {
-        organizationId
-      } = req.params
-      
       const categoryAlreadyExists = await prisma.category.findUnique({
         where: {
-          name
-        }
-      }) 
+          name,
+        },
+      })
 
-      if(categoryAlreadyExists) throw new BadRequestError('Category already exists')
+      if (categoryAlreadyExists)
+        throw new BadRequestError('Category already exists')
 
       const category = await prisma.category.create({
         data: {
@@ -52,15 +47,15 @@ export async function createCategoryRoute(app: FastifyInstance) {
           imageUrl,
           organization: {
             connect: {
-              id: organizationId
-            }
-          }
-        }
+              id: organizationId,
+            },
+          },
+        },
       })
 
       return reply.status(201).send({
-        categoryId: category.id
+        categoryId: category.id,
       })
-
-    })
+    },
+  )
 }
