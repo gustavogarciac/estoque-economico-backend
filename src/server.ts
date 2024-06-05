@@ -17,6 +17,7 @@ import { getCategoriesRoute } from './http/controllers/categories/get-categories
 import { getCategoryDetailsRoute } from './http/controllers/categories/show-category-details'
 import { updateCategoryRoute } from './http/controllers/categories/update-category'
 import { createOrganizationRoute } from './http/controllers/organizations/create-organization'
+import { getOrganizationMembersRoute } from './http/controllers/organizations/get-organization-members'
 import { registerUserRoute } from './http/controllers/register-user'
 import { errorHandler } from './http/error-handler'
 
@@ -64,6 +65,7 @@ app.register(updateCategoryRoute)
 
 /* Organization routes */
 app.register(createOrganizationRoute)
+app.register(getOrganizationMembersRoute)
 
 app
   .listen({

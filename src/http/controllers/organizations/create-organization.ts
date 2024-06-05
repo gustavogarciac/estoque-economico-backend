@@ -68,6 +68,12 @@ export async function createOrganizationRoute(app: FastifyInstance) {
           ownerId,
           domain,
           shouldAttachUsersByDomain,
+          members: {
+            create: {
+              userId: ownerId,
+              role: 'ADMIN',
+            },
+          },
         },
       })
 
