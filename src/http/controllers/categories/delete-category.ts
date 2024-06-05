@@ -1,9 +1,10 @@
 import { FastifyInstance } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { ResourceNotFoundError } from 'src/http/_errors/resource-not-found-error'
 import { prisma } from 'src/lib/prismadb'
 import z from 'zod'
 
-export async function createCategoryRoute(app: FastifyInstance) {
+export async function deleteCategoryRoute(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().delete(
     '/categories/:categoryId',
     {
@@ -25,9 +26,7 @@ export async function createCategoryRoute(app: FastifyInstance) {
       })
 
       if (!category) {
-        return reply.status(404).send({
-          message: 'Category not found',
-        })
+        throw new ResourceNotFoundError('Category not found')
       }
 
       await prisma.category.delete({

@@ -12,8 +12,11 @@ import {
 import { env } from './env'
 import { authenticateWithPasswordRoute } from './http/controllers/authenticate-with-password'
 import { createCategoryRoute } from './http/controllers/categories/create-category'
+import { deleteCategoryRoute } from './http/controllers/categories/delete-category'
 import { getCategoriesRoute } from './http/controllers/categories/get-categories'
 import { getCategoryDetailsRoute } from './http/controllers/categories/show-category-details'
+import { updateCategoryRoute } from './http/controllers/categories/update-category'
+import { createOrganizationRoute } from './http/controllers/organizations/create-organization'
 import { registerUserRoute } from './http/controllers/register-user'
 import { errorHandler } from './http/error-handler'
 
@@ -46,12 +49,21 @@ app.setSerializerCompiler(serializerCompiler)
 
 app.setErrorHandler(errorHandler)
 
-/* Routes */
+/* ============== Routes ============== */
+
+/* Auth Routes */
 app.register(registerUserRoute)
 app.register(authenticateWithPasswordRoute)
+
+/* Categories routes */
 app.register(createCategoryRoute)
 app.register(getCategoryDetailsRoute)
 app.register(getCategoriesRoute)
+app.register(deleteCategoryRoute)
+app.register(updateCategoryRoute)
+
+/* Organization routes */
+app.register(createOrganizationRoute)
 
 app
   .listen({
