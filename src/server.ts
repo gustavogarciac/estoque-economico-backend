@@ -1,3 +1,4 @@
+import fastifyCors from '@fastify/cors'
 import fastifyJwt from '@fastify/jwt'
 import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUi from '@fastify/swagger-ui'
@@ -17,11 +18,17 @@ import { getCategoriesRoute } from './http/controllers/categories/get-categories
 import { getCategoryDetailsRoute } from './http/controllers/categories/show-category-details'
 import { updateCategoryRoute } from './http/controllers/categories/update-category'
 import { createOrganizationRoute } from './http/controllers/organizations/create-organization'
+import { deleteOrganizationRoute } from './http/controllers/organizations/delete-organization'
 import { getOrganizationMembersRoute } from './http/controllers/organizations/get-organization-members'
+import { getOrganizationProductsRoute } from './http/controllers/organizations/get-organization-products'
 import { registerUserRoute } from './http/controllers/register-user'
 import { errorHandler } from './http/error-handler'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
+
+app.register(fastifyCors, {
+  origin: '*',
+})
 
 app.register(fastifyJwt, {
   secret: env.JWT_SECRET,
@@ -66,6 +73,8 @@ app.register(updateCategoryRoute)
 /* Organization routes */
 app.register(createOrganizationRoute)
 app.register(getOrganizationMembersRoute)
+app.register(getOrganizationProductsRoute)
+app.register(deleteOrganizationRoute)
 
 app
   .listen({
