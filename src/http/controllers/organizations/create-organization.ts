@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker'
 import { FastifyInstance } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { BadRequestError } from 'src/http/_errors/bad-request-error'
@@ -64,7 +65,7 @@ export async function createOrganizationRoute(app: FastifyInstance) {
           name,
           slug,
           description,
-          imageUrl,
+          imageUrl: imageUrl ?? faker.image.avatarGitHub(),
           ownerId,
           domain,
           shouldAttachUsersByDomain,
