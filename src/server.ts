@@ -21,6 +21,7 @@ import { createOrganizationRoute } from './http/controllers/organizations/create
 import { deleteOrganizationRoute } from './http/controllers/organizations/delete-organization'
 import { getOrganizationMembersRoute } from './http/controllers/organizations/get-organization-members'
 import { getOrganizationProductsRoute } from './http/controllers/organizations/get-organization-products'
+import { getOrganizationsRoute } from './http/controllers/organizations/get-organizations'
 import { registerUserRoute } from './http/controllers/register-user'
 import { errorHandler } from './http/error-handler'
 
@@ -75,6 +76,7 @@ app.register(createOrganizationRoute)
 app.register(getOrganizationMembersRoute)
 app.register(getOrganizationProductsRoute)
 app.register(deleteOrganizationRoute)
+app.register(getOrganizationsRoute)
 
 app
   .listen({
