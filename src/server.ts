@@ -24,6 +24,7 @@ import { getOrganizationProductsRoute } from './http/controllers/organizations/g
 import { getOrganizationsRoute } from './http/controllers/organizations/get-organizations'
 import { registerUserRoute } from './http/controllers/register-user'
 import { getUserProfileRoute } from './http/controllers/users/get-user-details'
+import { getUserOrganizationsRoute } from './http/controllers/users/get-user-organizations'
 import { errorHandler } from './http/error-handler'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -67,6 +68,7 @@ app.register(authenticateWithPasswordRoute)
 
 /* User Routes */
 app.register(getUserProfileRoute)
+app.register(getUserOrganizationsRoute)
 
 /* Categories routes */
 app.register(createCategoryRoute)
