@@ -10,10 +10,29 @@ export async function getOrganizationProductsRoute(app: FastifyInstance) {
     {
       schema: {
         summary: 'Get organization products',
-        tags: ['organizations'],
+        tags: ['organizations', 'products'],
         params: z.object({
           organizationId: z.string().uuid(),
         }),
+        response: {
+          200: z.object({
+            products: z.array(
+              z.object({
+                id: z.string().uuid(),
+                name: z.string(),
+                code: z.string(),
+                stock: z.number(),
+                description: z.string().nullable(),
+                author: z.object({
+                  id: z.string().uuid(),
+                  name: z.string(),
+                }),
+                category: z.string(),
+                registeredAt: z.date(),
+              }),
+            ),
+          }),
+        },
       },
     },
     async (req, reply) => {
@@ -33,9 +52,39 @@ export async function getOrganizationProductsRoute(app: FastifyInstance) {
         where: {
           organizationId,
         },
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          stock: true,
+          description: true,
+          createdAt: true,
+          registered_by: {
+            select: {
+              name: true,
+              id: true,
+            },
+          },
+          category: {
+            select: {
+              name: true,
+            },
+          },
+        },
       })
 
-      return reply.status(200).send(products)
+      const formattedProductList = products.map((product) => ({
+        id: product.id,
+        name: product.name,
+        code: product.code,
+        stock: product.stock,
+        description: product.description,
+        author: product.registered_by,
+        category: product.category.name,
+        registeredAt: product.createdAt,
+      }))
+
+      return reply.status(200).send({ products: formattedProductList })
     },
   )
 }
