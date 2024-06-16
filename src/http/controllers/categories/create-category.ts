@@ -17,7 +17,7 @@ export async function createCategoryRoute(app: FastifyInstance) {
         body: z.object({
           name: z.string(),
           description: z.string().optional(),
-          imageUrl: z.string().optional(),
+          imageUrl: z.string().nullish(),
         }),
         response: {
           201: z.object({
@@ -31,9 +31,10 @@ export async function createCategoryRoute(app: FastifyInstance) {
 
       const { organizationId } = req.params
 
-      const categoryAlreadyExists = await prisma.category.findUnique({
+      const categoryAlreadyExists = await prisma.category.findFirst({
         where: {
           name,
+          organizationId,
         },
       })
 
@@ -52,6 +53,8 @@ export async function createCategoryRoute(app: FastifyInstance) {
           },
         },
       })
+
+      console.log(category)
 
       return reply.status(201).send({
         categoryId: category.id,
