@@ -22,6 +22,7 @@ import { deleteOrganizationRoute } from './http/controllers/organizations/delete
 import { getOrganizationMembersRoute } from './http/controllers/organizations/get-organization-members'
 import { getOrganizationProductsRoute } from './http/controllers/organizations/get-organization-products'
 import { getOrganizationsRoute } from './http/controllers/organizations/get-organizations'
+import { createProductRoute } from './http/controllers/products/create-product'
 import { registerUserRoute } from './http/controllers/register-user'
 import { getUserProfileRoute } from './http/controllers/users/get-user-details'
 import { getUserOrganizationsRoute } from './http/controllers/users/get-user-organizations'
@@ -69,6 +70,9 @@ app.register(authenticateWithPasswordRoute)
 /* User Routes */
 app.register(getUserProfileRoute)
 app.register(getUserOrganizationsRoute)
+
+/* Product Routes */
+app.register(createProductRoute)
 
 /* Categories routes */
 app.register(createCategoryRoute)

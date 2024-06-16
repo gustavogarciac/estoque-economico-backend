@@ -87,7 +87,7 @@ model Invite {
 
 model Products {
   id          String  @id @default(uuid())
-  name        String
+  name        String?
   description String?
   stock       Int     @default(0)
   code        String
