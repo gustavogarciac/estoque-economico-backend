@@ -22,12 +22,16 @@ export async function getOrganizationProductsRoute(app: FastifyInstance) {
                 name: z.string().nullable(),
                 code: z.string(),
                 stock: z.number(),
+                organizationId: z.string().uuid(),
                 description: z.string().nullable(),
                 author: z.object({
                   id: z.string().uuid(),
                   name: z.string(),
                 }),
-                category: z.string(),
+                category: z.object({
+                  id: z.string().uuid(),
+                  name: z.string(),
+                }),
                 registeredAt: z.date(),
               }),
             ),
@@ -59,6 +63,7 @@ export async function getOrganizationProductsRoute(app: FastifyInstance) {
           stock: true,
           description: true,
           createdAt: true,
+          organizationId: true,
           registered_by: {
             select: {
               name: true,
@@ -68,6 +73,7 @@ export async function getOrganizationProductsRoute(app: FastifyInstance) {
           category: {
             select: {
               name: true,
+              id: true,
             },
           },
         },
@@ -83,8 +89,12 @@ export async function getOrganizationProductsRoute(app: FastifyInstance) {
         stock: product.stock,
         description: product.description,
         author: product.registered_by,
-        category: product.category.name,
+        category: {
+          id: product.category.id,
+          name: product.category.name,
+        },
         registeredAt: product.createdAt,
+        organizationId: product.organizationId,
       }))
 
       return reply.status(200).send({ products: formattedProductList })
