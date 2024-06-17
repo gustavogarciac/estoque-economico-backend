@@ -23,6 +23,7 @@ import { getOrganizationMembersRoute } from './http/controllers/organizations/ge
 import { getOrganizationProductsRoute } from './http/controllers/organizations/get-organization-products'
 import { getOrganizationsRoute } from './http/controllers/organizations/get-organizations'
 import { createProductRoute } from './http/controllers/products/create-product'
+import { updateProductRoute } from './http/controllers/products/update-product'
 import { registerUserRoute } from './http/controllers/register-user'
 import { getUserProfileRoute } from './http/controllers/users/get-user-details'
 import { getUserOrganizationsRoute } from './http/controllers/users/get-user-organizations'
@@ -73,6 +74,7 @@ app.register(getUserOrganizationsRoute)
 
 /* Product Routes */
 app.register(createProductRoute)
+app.register(updateProductRoute)
 
 /* Categories routes */
 app.register(createCategoryRoute)
