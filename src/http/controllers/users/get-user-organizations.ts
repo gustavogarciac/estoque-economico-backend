@@ -15,6 +15,11 @@ export async function getUserOrganizationsRoute(app: FastifyInstance) {
         schema: {
           summary: 'Get user organizations',
           tags: ['users'],
+          security: [
+            {
+              bearerAuth: [],
+            },
+          ],
           response: {
             200: z.array(
               z.object({

@@ -12,6 +12,7 @@ import {
 
 import { env } from './env'
 import { authenticateWithPasswordRoute } from './http/controllers/authenticate-with-password'
+import { getProductStock } from './http/controllers/billing/get-product-stock'
 import { createCategoryRoute } from './http/controllers/categories/create-category'
 import { deleteCategoryRoute } from './http/controllers/categories/delete-category'
 import { getCategoriesRoute } from './http/controllers/categories/get-categories'
@@ -40,14 +41,20 @@ app.register(fastifyJwt, {
 })
 
 app.register(fastifySwagger, {
-  swagger: {
-    consumes: ['application/json'],
-    produces: ['application/json'],
+  openapi: {
     info: {
       title: 'Estoque Econômico',
-      description:
-        'Especificações da API para o back-end da aplicação Estoque Econômico',
+      description: 'API Documentation for Estoque Econômico',
       version: '1.0.0',
+    },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
     },
   },
   transform: jsonSchemaTransform,
@@ -89,6 +96,9 @@ app.register(getOrganizationMembersRoute)
 app.register(getOrganizationProductsRoute)
 app.register(deleteOrganizationRoute)
 app.register(getOrganizationsRoute)
+
+/* Billing Routes */
+app.register(getProductStock)
 
 app
   .listen({

@@ -4,84 +4,94 @@ import { BadRequestError } from 'src/http/_errors/bad-request-error'
 import { prisma } from 'src/lib/prismadb'
 import z from 'zod'
 
+import { auth } from '../../middlewares/auth'
+
 export async function createProductRoute(app: FastifyInstance) {
-  app.withTypeProvider<ZodTypeProvider>().post(
-    '/products/:organizationId',
-    {
-      schema: {
-        summary: 'Create a new product',
-        tags: ['products'],
-        params: z.object({
-          organizationId: z.string().uuid(),
-        }),
-        body: z.object({
-          authorId: z.string().uuid(),
-          stock: z.number().default(1),
-          categoryId: z.string().uuid(),
-          description: z.string().nullish(),
-          name: z.string().nullish(),
-          code: z.string(),
-        }),
-        response: {
-          201: z.object({
-            productId: z.string().uuid(),
+  app
+    .withTypeProvider<ZodTypeProvider>()
+    .register(auth)
+    .post(
+      '/products/:slug',
+      {
+        schema: {
+          summary: 'Create a new product',
+          tags: ['products'],
+          params: z.object({
+            slug: z.string(),
           }),
+          security: [
+            {
+              bearerAuth: [],
+            },
+          ],
+          body: z.object({
+            stock: z.number().default(1),
+            categoryId: z.string().uuid(),
+            description: z.string().nullish(),
+            name: z.string().nullish(),
+            code: z.string(),
+          }),
+          response: {
+            201: z.object({
+              productId: z.string().uuid(),
+            }),
+          },
         },
       },
-    },
-    async (req, reply) => {
-      const { authorId, stock, categoryId, code, description, name } = req.body
-      const { organizationId } = req.params
+      async (req, reply) => {
+        const userId = await req.getCurrentUserId()
+        const { stock, categoryId, code, description, name } = req.body
+        const { slug } = req.params
 
-      const organization = await prisma.organization.findFirst({
-        where: {
-          id: organizationId,
-        },
-      })
+        const organization = await prisma.organization.findFirst({
+          where: {
+            slug,
+          },
+        })
 
-      if (!organization) throw new BadRequestError('Organization not found')
+        if (!organization) throw new BadRequestError('Organization not found')
 
-      const author = await prisma.user.findFirst({
-        where: {
-          id: authorId,
-        },
-      })
+        const author = await prisma.user.findFirst({
+          where: {
+            id: userId,
+          },
+        })
 
-      if (!author) throw new BadRequestError('Author not found')
+        if (!author) throw new BadRequestError('Author not found')
 
-      const category = await prisma.category.findFirst({
-        where: {
-          id: categoryId,
-        },
-      })
+        const category = await prisma.category.findFirst({
+          where: {
+            id: categoryId,
+          },
+        })
 
-      if (!category) throw new BadRequestError('Category not found')
+        if (!category) throw new BadRequestError('Category not found')
 
-      const product = await prisma.products.create({
-        data: {
-          code,
-          description,
-          name,
-          stock,
-          registered_by: {
-            connect: {
-              id: authorId,
+        const product = await prisma.products.create({
+          data: {
+            code,
+            description,
+            name,
+            stock,
+            registered_by: {
+              connect: {
+                id: userId,
+              },
+            },
+            organization: {
+              connect: {
+                id: organization.id,
+              },
+            },
+            category: {
+              connect: {
+                id: categoryId,
+              },
             },
           },
-          organization: {
-            connect: {
-              id: organizationId,
-            },
-          },
-          category: {
-            connect: {
-              id: categoryId,
-            },
-          },
-        },
-      })
+        })
 
-      return reply.status(201).send({ productId: product.id })
-    },
-  )
+        return reply.status(201).send({ productId: product.id })
+      },
+    )
 }
