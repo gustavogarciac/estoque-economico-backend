@@ -11,6 +11,11 @@ export async function deleteOrganizationRoute(app: FastifyInstance) {
       schema: {
         summary: 'Delete organization',
         tags: ['organizations'],
+        security: [
+          {
+            bearerAuth: [],
+          },
+        ],
         params: z.object({
           slug: z.string(),
         }),
