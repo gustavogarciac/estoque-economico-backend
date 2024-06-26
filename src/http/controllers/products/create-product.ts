@@ -11,7 +11,7 @@ export async function createProductRoute(app: FastifyInstance) {
     .withTypeProvider<ZodTypeProvider>()
     .register(auth)
     .post(
-      '/products/:slug',
+      '/organizations/:slug/products',
       {
         schema: {
           summary: 'Create a new product',
@@ -40,24 +40,10 @@ export async function createProductRoute(app: FastifyInstance) {
       },
       async (req, reply) => {
         const userId = await req.getCurrentUserId()
-        const { stock, categoryId, code, description, name } = req.body
         const { slug } = req.params
-
-        const organization = await prisma.organization.findFirst({
-          where: {
-            slug,
-          },
-        })
-
-        if (!organization) throw new BadRequestError('Organization not found')
-
-        const author = await prisma.user.findFirst({
-          where: {
-            id: userId,
-          },
-        })
-
-        if (!author) throw new BadRequestError('Author not found')
+        const { stock, categoryId, code, description, name } = req.body
+        const { organization } = await req.getMembership(slug)
+        await req.verifyMember(slug)
 
         const category = await prisma.category.findFirst({
           where: {
