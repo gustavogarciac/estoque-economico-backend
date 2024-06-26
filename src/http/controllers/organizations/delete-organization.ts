@@ -6,22 +6,22 @@ import z from 'zod'
 
 export async function deleteOrganizationRoute(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().delete(
-    '/organizations/:organizationId/members',
+    '/organizations/:slug',
     {
       schema: {
-        summary: 'Get organization members',
+        summary: 'Delete organization',
         tags: ['organizations'],
         params: z.object({
-          organizationId: z.string().uuid(),
+          slug: z.string(),
         }),
       },
     },
     async (req, reply) => {
-      const { organizationId } = req.params
+      const { slug } = req.params
 
       const organization = await prisma.organization.findFirst({
         where: {
-          id: organizationId,
+          slug,
         },
       })
 
@@ -31,7 +31,7 @@ export async function deleteOrganizationRoute(app: FastifyInstance) {
 
       await prisma.organization.delete({
         where: {
-          id: organizationId,
+          id: organization.id,
         },
       })
 
