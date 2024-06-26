@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-import { ResourceNotFoundError } from 'src/http/_errors/resource-not-found-error'
+import { UnauthorizedError } from 'src/http/_errors/unauthorized-error'
 import { auth } from 'src/http/middlewares/auth'
 import { prisma } from 'src/lib/prismadb'
 import z from 'zod'
@@ -10,37 +10,45 @@ export async function getProductStock(app: FastifyInstance) {
     .withTypeProvider<ZodTypeProvider>()
     .register(auth)
     .get(
-      '/organizations/:organizationId/product-stock',
+      '/organizations/:slug/product-stock',
       {
         schema: {
           summary: 'Get organization products stock',
           tags: ['billing'],
+          security: [
+            {
+              bearerAuth: [],
+            },
+          ],
           params: z.object({
-            organizationId: z.string().uuid(),
+            slug: z.string(),
           }),
           response: {
-            // 200: z.array(
-            //   z.object({
-            //     id: z.string().uuid(),
-            //     name: z.string(),
-            //     description: z.string().nullish(),
-            //     imageUrl: z.string().nullish(),
-            //   }),
-            // ),
+            200: z.object({
+              products: z.array(
+                z.object({
+                  code: z.string(),
+                  id: z.string(),
+                  name: z.string().nullable(),
+                  stock: z.number(),
+                }),
+              ),
+            }),
           },
         },
       },
       async (req, reply) => {
-        const { organizationId } = req.params
+        const { slug } = req.params
+        const { organization, membership } = await req.getMembership(slug)
 
-        const organization = await prisma.organization.findUnique({
-          where: {
-            id: organizationId,
-          },
-        })
+        const userHasAuthorization =
+          membership.role === 'ADMIN' || membership.role === 'BILLING'
 
-        if (!organization)
-          throw new ResourceNotFoundError('Organization not found!')
+        if (!userHasAuthorization) {
+          throw new UnauthorizedError(
+            "You don't have permission to access this resource",
+          )
+        }
 
         const products = await prisma.products.findMany({
           where: {
