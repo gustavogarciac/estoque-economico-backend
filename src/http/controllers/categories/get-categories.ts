@@ -1,59 +1,61 @@
 import { FastifyInstance } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-import { ResourceNotFoundError } from 'src/http/_errors/resource-not-found-error'
+import { auth } from 'src/http/middlewares/auth'
 import { prisma } from 'src/lib/prismadb'
 import z from 'zod'
 
 export async function getCategoriesRoute(app: FastifyInstance) {
-  app.withTypeProvider<ZodTypeProvider>().get(
-    '/organizations/:organizationId/categories',
-    {
-      schema: {
-        summary: 'Get a organization categories',
-        tags: ['categories', 'organizations'],
-        params: z.object({
-          organizationId: z.string().uuid(),
-        }),
-        response: {
-          200: z.array(
-            z.object({
-              id: z.string().uuid(),
-              name: z.string(),
-              description: z.string().nullish(),
-              imageUrl: z.string().nullish(),
-            }),
-          ),
+  app
+    .withTypeProvider<ZodTypeProvider>()
+    .register(auth)
+    .get(
+      '/organizations/:slug/categories',
+      {
+        schema: {
+          security: [
+            {
+              bearerAuth: [],
+            },
+          ],
+          summary: 'Get an organization categories',
+          tags: ['categories', 'organizations'],
+          params: z.object({
+            slug: z.string(),
+          }),
+          response: {
+            200: z.array(
+              z.object({
+                id: z.string().uuid(),
+                name: z.string(),
+                description: z.string().nullish(),
+                imageUrl: z.string().nullish(),
+              }),
+            ),
+          },
         },
       },
-    },
-    async (req, reply) => {
-      const { organizationId } = req.params
+      async (req, reply) => {
+        const { slug } = req.params
 
-      const organization = await prisma.organization.findUnique({
-        where: {
-          id: organizationId,
-        },
-      })
+        const { organization } = await req.getMembership(slug)
+        await req.verifyMember(slug)
 
-      if (!organization)
-        throw new ResourceNotFoundError('Organization not found!')
+        const categories = await prisma.category.findMany({
+          where: {
+            organizationId: organization.id,
+          },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            imageUrl: true,
+          },
+          orderBy: {
+            name: 'asc',
+          },
+        })
 
-      const categories = await prisma.category.findMany({
-        where: {
-          organizationId,
-        },
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          imageUrl: true,
-        },
-        orderBy: {
-          name: 'asc',
-        },
-      })
-
-      return reply.status(200).send(categories)
-    },
-  )
+        return reply.status(200).send(categories)
+      },
+    )
 }

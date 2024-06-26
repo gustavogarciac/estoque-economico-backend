@@ -9,5 +9,6 @@ declare module 'fastify' {
       slug: string,
     ): Promise<{ organization: Organization; membership: Member }>
     verifyAdmin(orgSlug: string): Promise<void>
+    verifyMember(orgSlug: string): Promise<void>
   }
 }
