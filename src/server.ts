@@ -28,6 +28,7 @@ import { updateProductRoute } from './http/controllers/products/update-product'
 import { registerUserRoute } from './http/controllers/register-user'
 import { getUserProfileRoute } from './http/controllers/users/get-user-details'
 import { getUserOrganizationsRoute } from './http/controllers/users/get-user-organizations'
+import { onboardUserRoute } from './http/controllers/users/onboard-user'
 import { errorHandler } from './http/error-handler'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -78,6 +79,7 @@ app.register(authenticateWithPasswordRoute)
 /* User Routes */
 app.register(getUserProfileRoute)
 app.register(getUserOrganizationsRoute)
+app.register(onboardUserRoute)
 
 /* Product Routes */
 app.register(createProductRoute)

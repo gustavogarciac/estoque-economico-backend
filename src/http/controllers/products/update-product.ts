@@ -52,7 +52,6 @@ export async function updateProductRoute(app: FastifyInstance) {
         const product = await prisma.products.findFirst({
           where: {
             id: productId,
-            categoryId,
           },
         })
 

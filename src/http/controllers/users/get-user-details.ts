@@ -25,6 +25,7 @@ export async function getUserProfileRoute(app: FastifyInstance) {
               id: z.string(),
               email: z.string(),
               name: z.string(),
+              onboarded: z.boolean(),
               createdAt: z.date(),
               updatedAt: z.date(),
               member_on: z.array(
@@ -53,6 +54,7 @@ export async function getUserProfileRoute(app: FastifyInstance) {
             createdAt: true,
             updatedAt: true,
             member_on: true,
+            onboarded: true,
           },
         })
 

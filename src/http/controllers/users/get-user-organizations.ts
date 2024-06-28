@@ -25,6 +25,7 @@ export async function getUserOrganizationsRoute(app: FastifyInstance) {
               z.object({
                 id: z.string().uuid(),
                 name: z.string(),
+                slug: z.string(),
                 role: z.enum(['ADMIN', 'MEMBER', 'BILLING']),
                 domain: z.string().nullable(),
                 imageUrl: z.string().nullable(),
@@ -51,6 +52,7 @@ export async function getUserOrganizationsRoute(app: FastifyInstance) {
                     name: true,
                     domain: true,
                     imageUrl: true,
+                    slug: true,
                   },
                 },
               },
@@ -65,6 +67,7 @@ export async function getUserOrganizationsRoute(app: FastifyInstance) {
         const organizations = user.member_on.map((member) => ({
           id: member.organizationId,
           name: member.organization.name,
+          slug: member.organization.slug,
           role: member.role,
           domain: member.organization.domain,
           imageUrl: member.organization.imageUrl,
