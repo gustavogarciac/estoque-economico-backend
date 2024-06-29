@@ -22,6 +22,10 @@ export async function getOrganizationProductsRoute(app: FastifyInstance) {
           params: z.object({
             slug: z.string(),
           }),
+          querystring: z.object({
+            code: z.string().optional(),
+            name: z.string().optional(),
+          }),
           response: {
             200: z.object({
               products: z.array(
@@ -49,11 +53,19 @@ export async function getOrganizationProductsRoute(app: FastifyInstance) {
       },
       async (req, reply) => {
         const { slug } = req.params
+        const { code, name } = req.query
         const { organization } = await req.getMembership(slug)
 
         const products = await prisma.products.findMany({
           where: {
             organizationId: organization.id,
+            code: {
+              contains: code,
+            },
+            name: {
+              contains: name,
+              mode: 'insensitive',
+            },
           },
           select: {
             id: true,

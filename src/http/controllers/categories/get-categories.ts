@@ -22,6 +22,9 @@ export async function getCategoriesRoute(app: FastifyInstance) {
           params: z.object({
             slug: z.string(),
           }),
+          querystring: z.object({
+            name: z.string().optional(),
+          }),
           response: {
             200: z.array(
               z.object({
@@ -36,6 +39,7 @@ export async function getCategoriesRoute(app: FastifyInstance) {
       },
       async (req, reply) => {
         const { slug } = req.params
+        const { name } = req.query
 
         const { organization } = await req.getMembership(slug)
         await req.verifyMember(slug)
@@ -43,6 +47,10 @@ export async function getCategoriesRoute(app: FastifyInstance) {
         const categories = await prisma.category.findMany({
           where: {
             organizationId: organization.id,
+            name: {
+              contains: name,
+              mode: 'insensitive',
+            },
           },
           select: {
             id: true,
