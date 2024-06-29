@@ -19,14 +19,20 @@ export async function onboardUserRoute(app: FastifyInstance) {
               bearerAuth: [],
             },
           ],
+          body: z.object({
+            onboarded: z.boolean(),
+          }),
           tags: ['users'],
           response: {
-            204: z.null(),
+            200: z.object({
+              message: z.string(),
+            }),
           },
         },
       },
       async (req, reply) => {
         const userId = await req.getCurrentUserId()
+        const { onboarded } = req.body
 
         const user = await prisma.user.findFirst({
           where: {
@@ -48,11 +54,13 @@ export async function onboardUserRoute(app: FastifyInstance) {
             id: userId,
           },
           data: {
-            onboarded: true,
+            onboarded,
           },
         })
 
-        return reply.status(204).send()
+        return reply
+          .status(200)
+          .send({ message: 'Onboarding realizado com sucesso!' })
       },
     )
 }
